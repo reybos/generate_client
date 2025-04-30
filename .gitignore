@@ -79,5 +79,5 @@ Thumbs.db
 *.sw?
 
 # Generated files
-*.js
-*.jsx
+# *.js
+# *.jsx
