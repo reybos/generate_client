@@ -29,7 +29,7 @@ jspm_packages/
 
 # Dist and build folders
 dist/
-build/
+# build/
 
 # Environment variables
 .env
