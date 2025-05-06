@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { MyServer, type MyServerOptions } from "./my-server.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";

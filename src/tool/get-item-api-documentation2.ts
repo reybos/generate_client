@@ -10,8 +10,8 @@ import { makeNWSRequest } from "../utils/make-nws-request.js";
  * Tool: get-item-api-documentation
  * Get item api documentation from the remote YAML file.
  */
-export const getItemApiDocumentationTool: Tool = {
-  name: "get-item-api-documentation",
+export const getItemApiDocumentationToolNew: Tool = {
+  name: "get-item-api-documentation-new",
   description: "Get item api documentation",
   parameters: z.object({}),
   /**

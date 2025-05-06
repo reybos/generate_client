@@ -1,10 +1,9 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+#!/usr/bin/env node
+import { MyServer } from "./my-server.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import yaml from "js-yaml";
-const NWS_API_BASE = "https://raw.githubusercontent.com/reybos/otus-highload-social-network-2024/refs/heads/master/main-service/test.yaml";
-const USER_AGENT = "item-app/1.0";
+import { tools } from "./tool/index.js";
 // Create server instance
-const server = new McpServer({
+const server = new MyServer({
     name: "item-api",
     version: "1.0.0",
     capabilities: {
@@ -12,58 +11,14 @@ const server = new McpServer({
         tools: {},
     },
 });
-async function makeNWSRequest(url) {
-    const headers = {
-        "User-Agent": USER_AGENT,
-        Accept: "text/plain",
-    };
-    try {
-        const response = await fetch(url, { headers });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const textContent = await response.text();
-        try {
-            const yamlContent = yaml.load(textContent);
-            return yamlContent;
-        }
-        catch (parseError) {
-            console.error("Error parsing YAML content:", parseError);
-            throw new Error("Failed to parse YAML content");
-        }
-    }
-    catch (error) {
-        console.error("Error making request:", error);
-        return null;
-    }
-}
-server.tool("get-item-api-documentation", "Get item api documentation", async (extra) => {
-    try {
-        const data = await makeNWSRequest(NWS_API_BASE);
-        if (!data) {
-            throw new Error("Failed to retrieve or parse item-api data");
-        }
-        return {
-            content: [
-                {
-                    type: "text",
-                    text: typeof data === 'string' ? data : JSON.stringify(data, null, 2),
-                },
-            ],
-        };
-    }
-    catch (error) {
-        console.error("Error in get-item-api-documentation:", error);
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-        return {
-            content: [
-                {
-                    type: "text",
-                    text: `Failed to retrieve item-api data: ${errorMessage}`,
-                },
-            ],
-        };
-    }
+// List of all tools
+// const tools = [getItemApiDocumentationTool, getItemApiDocumentationToolNew];
+tools.forEach(tool => {
+    server.tool(tool.name, tool.description, async (extra) => {
+        // MCP convention: tool arguments are under 'arguments'
+        const params = tool.parameters.parse(extra?.arguments ?? {});
+        return tool.handler(params, extra);
+    });
 });
 async function main() {
     const transport = new StdioServerTransport();
